@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: "Cookie's Backend App"
+    version: 0.1
+    description: "Cookie's Backend App that consumes messages from RabbitMQ and stores data in DynamoDB."
+  main:
+    banner-mode: "off"
+  rabbitmq:
+    host: "docker-rabbitmq"
+    port: 5672
+    username: "cookieMq"
+    password: "very_secret_cookie_password"
+
+developer:
+  name: "CookieMr"
+  email: "mr@cookie.inc"
+  url: "https://github.com/cookieMr"
+
+mr:
+  cookie:
+    queue:
+      name: "insertMoviesQueue"
+
+server:
+  port: 8082
+  servlet:
+    context-path: "/api"
+
+amazon:
+  dynamodb:
+    endpoint: "http://docker-dynamodb:8000/"
+    region: "us-west-1"
+  aws:
+    accesskey: "very_secret_aws_access_key"
+    secretkey: "very_secret_aws_key"
+
+---
+
+spring:
+  profiles: "local"
+  rabbitmq:
+    host: "localhost"
+amazon:
+  dynamodb:
+    endpoint: "http://localhost:8000/"

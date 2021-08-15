@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+
+    docker-rabbitmq:
+        image: rabbitmq:3.8-management
+        restart: always
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        environment:
+            - "RABBITMQ_DEFAULT_PASS=very_secret_cookie_password"
+            - "RABBITMQ_DEFAULT_USER=cookieMq"
+        logging:
+            driver: none
+        networks:
+            - java_develop
+
+    docker-dynamodb:
+        image: amazon/dynamodb-local
+        restart: always
+        command: "-jar DynamoDBLocal.jar -sharedDb"
+        working_dir: /home/dynamodblocal
+        ports:
+            - "8000:8000"
+        logging:
+            driver: none
+        networks:
+            - java_develop
+    
+    docker-dynamodb-admin:
+        build: ./dynamodb-admin
+        restart: always
+        ports:
+            - "8080:8001"
+        environment:
+            - "DYNAMO_ENDPOINT=http://docker-dynamodb:8000/"
+            - "AWS_SECRET_ACCESS_KEY=very_secret_aws_key"
+            - "AWS_ACCESS_KEY_ID=very_secret_aws_access_key"
+            - "AWS_REGION=local"
+        depends_on:
+            - docker-dynamodb
+        logging:
+            driver: none
+        networks:
+            - java_develop
+
+    docker-java-front:
+        build: ./front
+        restart: always
+        ports:
+            - "8081:8081"
+        depends_on:
+            - docker-rabbitmq
+        networks:
+            - java_develop
+
+    docker-java-backend:
+        build: ./backend
+        restart: always
+        ports:
+            - "8082:8082"
+        depends_on:
+            - docker-rabbitmq
+            - docker-dynamodb
+            - docker-dynamodb-admin
+            - docker-java-front
+        networks:
+            - java_develop
+
+    docker-setup-via-curl:
+        build: ./setup-via-curl
+        depends_on:
+            - docker-rabbitmq
+            - docker-dynamodb
+            - docker-dynamodb-admin
+            - docker-java-front
+            - docker-java-backend
+        logging:
+            driver: none
+        networks:
+            - java_develop
+        
+networks:
+    java_develop:

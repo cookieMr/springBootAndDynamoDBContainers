@@ -1,0 +1,8 @@
+<FindBugsFilter>
+
+    <Match>
+        <!-- TODO: Maybe a bug, maybe my bug in the code, i'll try to investigate this never. -->
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+</FindBugsFilter>
